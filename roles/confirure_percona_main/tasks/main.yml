@@ -1,0 +1,22 @@
+---
+# tasks file for percona_task
+
+- name: Create database
+  mysql_db:
+    name: "{{ db_name }}"
+    state: present
+    collation: "{{ db_collation }}"
+
+- name: Backup data to tmp folder
+  command: "xtrabackup --backup --target-dir={{ xtrabackup_folder }}"
+
+- name: Backup data to tmp folder
+  command: "xtrabackup --prepare --target-dir={{ xtrabackup_folder }}"
+
+- name: Copy backup to remote server
+  hosts: {{ server_slave }}
+  tasks:
+    - name: Copying Directory
+      copy:
+        src: {{ xtrabackup_folder }}
+        dest: {{ xtrabackup_folder }}
