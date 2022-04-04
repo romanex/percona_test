@@ -1,0 +1,62 @@
+---
+# tasks file for percona_task
+
+- name: Adding percona public key
+  apt_key:
+    url: http://www.percona.com/downloads/RPM-GPG-KEY-percona
+    state: present
+
+- name: Download percona Repo file
+  get_url:
+    url: "https://repo.percona.com/apt/percona-release_latest.{{ ansible_distribution_release }}_all.deb"
+    dest: "/tmp/"
+
+- name: Install percona repo file
+  apt:
+   deb: /tmp/percona-release_latest.{{ ansible_distribution_release }}_all.deb
+
+- name: Update apt cache
+  apt:
+    update_cache=yes
+
+- name: Install percona packadges
+  apt:
+    state: latest
+    name:
+     - percona-server-server-5.7
+     - python3-pip
+     - percona-xtrabackup-24
+
+- name: Make sure pymysql is present
+  pip:
+    name: pymysql
+    state: present
+
+- name: Ensure mysql root password is updated for all root accounts
+  mysql_user:
+    name: root
+    host: localhost
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    password: "{{ root_password }}"
+    priv: '*.*:ALL,GRANT'
+    check_implicit_admin: true
+    sql_log_bin: true
+  notify: restart percona
+
+- name: Copy .my.cnf file into the root home folder
+  template:
+    src: rootmy.cnf
+    dest: /root/.my.cnf
+    owner: root
+    mode: 0600
+
+- name: Enable service percona
+  ansible.builtin.service:
+    name: mysql
+    enabled: yes
+
+- name: Create database
+  mysql_db:
+    name: "{{ db_name }}"
+    state: present
+    collation: "{{ db_collation }}"

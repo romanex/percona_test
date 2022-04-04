@@ -1,0 +1,8 @@
+#main Vars
+root_password: RooTP@SSworD
+
+# DB Vars
+db_name: testbase
+db_collation: utf8_general_ci
+db_user: myuser
+db_user_password: Myp@ssWorD
