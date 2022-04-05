@@ -1,0 +1,8 @@
+---
+- name: Script for configure percona servers for intervie Serverel
+  hosts: localhost
+  become: yes
+
+  roles:
+
+  - { role: config_percona_main }

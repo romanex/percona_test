@@ -1,8 +1,7 @@
 #main Vars
 root_password: RooTP@SSworD
 server_main: 
-server_slave:
-
+server_slave: 127.0.0.1
 # DB Vars
 db_name: testbase
 db_collation: utf8_general_ci
